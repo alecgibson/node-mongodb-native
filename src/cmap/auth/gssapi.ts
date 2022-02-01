@@ -14,6 +14,7 @@ import { AuthContext, AuthProvider } from './auth_provider';
 
 type MechanismProperties = {
   gssapiCanonicalizeHostName?: boolean;
+  SERVICE_HOST?: string;
   SERVICE_NAME?: string;
   SERVICE_REALM?: string;
 };
@@ -70,6 +71,7 @@ export class GSSAPI extends AuthProvider {
     });
   }
 }
+
 function makeKerberosClient(authContext: AuthContext, callback: Callback<KerberosClient>): void {
   const { hostAddress } = authContext.options;
   const { credentials } = authContext;
@@ -100,7 +102,8 @@ function makeKerberosClient(authContext: AuthContext, callback: Callback<Kerbero
         Object.assign(initOptions, { user: username, password: password });
       }
 
-      let spn = `${serviceName}${process.platform === 'win32' ? '/' : '@'}${host}`;
+      const spnHost = mechanismProperties.SERVICE_HOST ?? host;
+      let spn = `${serviceName}${process.platform === 'win32' ? '/' : '@'}${spnHost}`;
       if ('SERVICE_REALM' in mechanismProperties) {
         spn = `${spn}@${mechanismProperties.SERVICE_REALM}`;
       }
