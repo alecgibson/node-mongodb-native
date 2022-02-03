@@ -84,6 +84,7 @@ BASE_TASKS.push({
         REQUIRE_API_VERSION: '1'
       }
     },
+    { func: 'bootstrap kms servers' },
     {
       func: 'run tests',
       vars: {

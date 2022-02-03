@@ -1009,6 +1009,7 @@ tasks:
           VERSION: latest
           TOPOLOGY: server
           REQUIRE_API_VERSION: '1'
+      - func: bootstrap kms servers
       - func: run tests
         vars:
           MONGODB_API_VERSION: '1'
