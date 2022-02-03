@@ -99,7 +99,7 @@ functions:
         script: |
           ${PREPARE_SHELL}
           DRIVERS_TOOLS="${DRIVERS_TOOLS}" bash ${DRIVERS_TOOLS}/.evergreen/atlas_data_lake/run-mongohouse-local.sh
-  run tests:
+  bootstrap kms servers:
     - command: shell.exec
       params:
         script: |
@@ -119,6 +119,7 @@ functions:
             ./kmstlsvenv/bin/python3 -u kms_http_server.py --ca_file ../x509gen/ca.pem --cert_file ../x509gen/wrong-host.pem --port 8001 &
             ./kmstlsvenv/bin/python3 -u kms_http_server.py --ca_file ../x509gen/ca.pem --cert_file ../x509gen/server.pem --port 8002 --require_client_cert &
           fi
+  run tests:
     - command: shell.exec
       type: test
       params:
@@ -680,28 +681,6 @@ functions:
           export CDRIVER_GIT_REF="${CDRIVER_GIT_REF}"
           EOT
     - command: shell.exec
-      params:
-        script: |
-          ${PREPARE_SHELL}
-          cd ${DRIVERS_TOOLS}/.evergreen/csfle
-          . ./activate_venv.sh
-    - command: shell.exec
-      params:
-        background: true
-        script: >
-          cd ${DRIVERS_TOOLS}/.evergreen/csfle
-
-          ./kmstlsvenv/bin/python3 -u kms_kmip_server.py &
-
-          ./kmstlsvenv/bin/python3 -u kms_http_server.py --ca_file ../x509gen/ca.pem --cert_file ../x509gen/expired.pem
-          --port 8000 &
-
-          ./kmstlsvenv/bin/python3 -u kms_http_server.py --ca_file ../x509gen/ca.pem --cert_file
-          ../x509gen/wrong-host.pem --port 8001 &
-
-          ./kmstlsvenv/bin/python3 -u kms_http_server.py --ca_file ../x509gen/ca.pem --cert_file ../x509gen/server.pem
-          --port 8002 --require_client_cert &
-    - command: shell.exec
       type: test
       params:
         working_dir: src
@@ -792,6 +771,7 @@ tasks:
         vars:
           VERSION: latest
           TOPOLOGY: server
+      - func: bootstrap kms servers
       - func: run tests
   - name: test-latest-replica_set
     tags:
@@ -803,6 +783,7 @@ tasks:
         vars:
           VERSION: latest
           TOPOLOGY: replica_set
+      - func: bootstrap kms servers
       - func: run tests
   - name: test-latest-sharded_cluster
     tags:
@@ -814,6 +795,7 @@ tasks:
         vars:
           VERSION: latest
           TOPOLOGY: sharded_cluster
+      - func: bootstrap kms servers
       - func: run tests
   - name: test-5.0-server
     tags:
@@ -825,6 +807,7 @@ tasks:
         vars:
           VERSION: '5.0'
           TOPOLOGY: server
+      - func: bootstrap kms servers
       - func: run tests
   - name: test-5.0-replica_set
     tags:
@@ -836,6 +819,7 @@ tasks:
         vars:
           VERSION: '5.0'
           TOPOLOGY: replica_set
+      - func: bootstrap kms servers
       - func: run tests
   - name: test-5.0-sharded_cluster
     tags:
@@ -847,6 +831,7 @@ tasks:
         vars:
           VERSION: '5.0'
           TOPOLOGY: sharded_cluster
+      - func: bootstrap kms servers
       - func: run tests
   - name: test-4.4-server
     tags:
@@ -858,6 +843,7 @@ tasks:
         vars:
           VERSION: '4.4'
           TOPOLOGY: server
+      - func: bootstrap kms servers
       - func: run tests
   - name: test-4.4-replica_set
     tags:
@@ -869,6 +855,7 @@ tasks:
         vars:
           VERSION: '4.4'
           TOPOLOGY: replica_set
+      - func: bootstrap kms servers
       - func: run tests
   - name: test-4.4-sharded_cluster
     tags:
@@ -880,6 +867,7 @@ tasks:
         vars:
           VERSION: '4.4'
           TOPOLOGY: sharded_cluster
+      - func: bootstrap kms servers
       - func: run tests
   - name: test-4.2-server
     tags:
@@ -891,6 +879,7 @@ tasks:
         vars:
           VERSION: '4.2'
           TOPOLOGY: server
+      - func: bootstrap kms servers
       - func: run tests
   - name: test-4.2-replica_set
     tags:
@@ -902,6 +891,7 @@ tasks:
         vars:
           VERSION: '4.2'
           TOPOLOGY: replica_set
+      - func: bootstrap kms servers
       - func: run tests
   - name: test-4.2-sharded_cluster
     tags:
@@ -913,6 +903,7 @@ tasks:
         vars:
           VERSION: '4.2'
           TOPOLOGY: sharded_cluster
+      - func: bootstrap kms servers
       - func: run tests
   - name: test-4.0-server
     tags:
@@ -924,6 +915,7 @@ tasks:
         vars:
           VERSION: '4.0'
           TOPOLOGY: server
+      - func: bootstrap kms servers
       - func: run tests
   - name: test-4.0-replica_set
     tags:
@@ -935,6 +927,7 @@ tasks:
         vars:
           VERSION: '4.0'
           TOPOLOGY: replica_set
+      - func: bootstrap kms servers
       - func: run tests
   - name: test-4.0-sharded_cluster
     tags:
@@ -946,6 +939,7 @@ tasks:
         vars:
           VERSION: '4.0'
           TOPOLOGY: sharded_cluster
+      - func: bootstrap kms servers
       - func: run tests
   - name: test-3.6-server
     tags:
@@ -957,6 +951,7 @@ tasks:
         vars:
           VERSION: '3.6'
           TOPOLOGY: server
+      - func: bootstrap kms servers
       - func: run tests
   - name: test-3.6-replica_set
     tags:
@@ -968,6 +963,7 @@ tasks:
         vars:
           VERSION: '3.6'
           TOPOLOGY: replica_set
+      - func: bootstrap kms servers
       - func: run tests
   - name: test-3.6-sharded_cluster
     tags:
@@ -979,6 +975,7 @@ tasks:
         vars:
           VERSION: '3.6'
           TOPOLOGY: sharded_cluster
+      - func: bootstrap kms servers
       - func: run tests
   - name: test-latest-server-v1-api
     tags:
@@ -1020,6 +1017,7 @@ tasks:
           TOPOLOGY: sharded_cluster
           LOAD_BALANCER: 'true'
       - func: start-load-balancer
+      - func: bootstrap kms servers
       - func: run-lb-tests
       - func: stop-load-balancer
   - name: test-auth-kerberos
@@ -1044,6 +1042,7 @@ tasks:
         vars:
           VERSION: latest
           TOPOLOGY: replica_set
+      - func: bootstrap kms servers
       - func: run socks5 tests
   - name: test-socks5-tls
     tags: []
