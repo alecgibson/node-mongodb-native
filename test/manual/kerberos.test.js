@@ -51,6 +51,68 @@ describe('Kerberos', function () {
     });
   });
 
+  context('when passing in CANONICALIZE_HOST_NAME', function () {
+    context('when the value is true', function () {
+      it('successfully authenticates', function (done) {
+        const client = new MongoClient(
+          `${krb5Uri}&authMechanismProperties=SERVICE_NAME:mongodb,CANONICALIZE_HOST_NAME:true&maxPoolSize=1`
+        );
+        client.connect(function (err, client) {
+          if (err) return done(err);
+          verifyKerberosAuthentication(client, done);
+        });
+      });
+    });
+
+    context('when the value is forward', function () {
+      it('successfully authenticates', function (done) {
+        const client = new MongoClient(
+          `${krb5Uri}&authMechanismProperties=SERVICE_NAME:mongodb,CANONICALIZE_HOST_NAME:forward&maxPoolSize=1`
+        );
+        client.connect(function (err, client) {
+          if (err) return done(err);
+          verifyKerberosAuthentication(client, done);
+        });
+      });
+    });
+
+    context('when the value is forwardAndReverse', function () {
+      it('successfully authenticates', function (done) {
+        const client = new MongoClient(
+          `${krb5Uri}&authMechanismProperties=SERVICE_NAME:mongodb,CANONICALIZE_HOST_NAME:forwardAndReverse&maxPoolSize=1`
+        );
+        client.connect(function (err, client) {
+          if (err) return done(err);
+          verifyKerberosAuthentication(client, done);
+        });
+      });
+    });
+
+    context('when the value is false', function () {
+      it('successfully authenticates', function (done) {
+        const client = new MongoClient(
+          `${krb5Uri}&authMechanismProperties=SERVICE_NAME:mongodb,CANONICALIZE_HOST_NAME:false&maxPoolSize=1`
+        );
+        client.connect(function (err, client) {
+          if (err) return done(err);
+          verifyKerberosAuthentication(client, done);
+        });
+      });
+    });
+
+    context('when the value is none', function () {
+      it('successfully authenticates', function (done) {
+        const client = new MongoClient(
+          `${krb5Uri}&authMechanismProperties=SERVICE_NAME:mongodb,CANONICALIZE_HOST_NAME:none&maxPoolSize=1`
+        );
+        client.connect(function (err, client) {
+          if (err) return done(err);
+          verifyKerberosAuthentication(client, done);
+        });
+      });
+    });
+  });
+
   // Unskip this test when a proper setup is available - see NODE-3060
   it.skip('validate that SERVICE_REALM and CANONICALIZE_HOST_NAME can be passed in', function (done) {
     const client = new MongoClient(
