@@ -346,6 +346,6 @@ export class TestConfiguration {
   }
 
   kmsProviders(localKey): Record<string, any> {
-    return { local: { key: localKey }};
+    return { local: { key: localKey } };
   }
 }
